@@ -1,20 +1,40 @@
 package com.laboratorio.guia04dsm
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        val names = resources.getStringArray(R.array.dish_names)
+        val descriptions =
+            resources.getStringArray(R.array.dish_descriptions)
+        val prices = resources.getStringArray(R.array.dish_prices)
+        val images = resources.getStringArray(R.array.dish_images)
+        val size = listOf(names.size, descriptions.size, prices.size,
+            images.size).minOrNull() ?: 0
+        val dishes = mutableListOf<Dish>()
+        for (i in 0 until size) {
+            dishes.add(Dish(names[i], descriptions[i], prices[i],
+                images[i]))
         }
-    }
-}
+        val adapter = DishAdapter(dishes) { dish ->
+            val intent = Intent(this, DetailActivity::class.java).apply {
+                putExtra("name", dish.name)
+                putExtra("description", dish.description)
+                putExtra("price", dish.price)
+                putExtra("imageName", dish.imageName)
+            }
+            startActivity(intent)
+
+
+        }
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+
+    }}
+
